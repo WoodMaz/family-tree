@@ -23,7 +23,6 @@ Every member contains:
 
 Database:
 * consider whether the database should be changed to SQL
-* consider whether 'Person' should be not in the 'User' document
 
 Application:
 * create methods for updating and deleting family members
