@@ -1,4 +1,7 @@
-package com.example.user;
+package com.example.dto.mappers;
+
+import com.example.dto.UserDTO;
+import com.example.models.User;
 
 public class UserMapper {
     public static UserDTO asDTO(User user) {

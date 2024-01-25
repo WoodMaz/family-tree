@@ -1,7 +1,9 @@
-package com.example.person;
+package com.example.services;
 
-import com.example.user.User;
-import com.example.user.UserRepository;
+import com.example.models.Person;
+import com.example.repositories.PersonRepository;
+import com.example.models.User;
+import com.example.repositories.UserRepository;
 import com.example.utils.ThrowingUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,13 @@ public class PersonService {
 
     public void add(String username, Person person) {
         User user = userRepository.getByUsername(username).orElseThrow(ThrowingUtil.userNotFound(username));
+//        user.getFamilyTree().add(person);
+//
+//        userRepository.save(user);
+        person.setUserId(user.getId());
         user.getFamilyTree().add(person);
+        personRepository.save(person);
 
-        userRepository.save(user);
         log.info("{} {} has been added", person.getName(), person.getSurname());
     }
 

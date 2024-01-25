@@ -1,14 +1,11 @@
-package com.example.person;
+package com.example.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 
-
-//TODO: PERHAPS PERSON BE ANOTHER COLLECTION WITH ADDITIONAL FIELD 'userId'
-//TODO: NOW ID IS NOT GENERATED
-
+@Document("person")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,4 +25,6 @@ public class Person {
     private String spouseId;
 
     private String note;
+
+    private String userId;
 }

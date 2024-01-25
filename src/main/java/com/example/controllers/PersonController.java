@@ -1,7 +1,9 @@
-package com.example.person;
+package com.example.controllers;
 
 import com.example.config.security.JwtAuthenticationFilter;
 import com.example.config.security.JwtService;
+import com.example.models.Person;
+import com.example.services.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

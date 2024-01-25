@@ -1,6 +1,11 @@
-package com.example.user;
+package com.example.services;
 
-import com.example.person.Person;
+import com.example.dto.UserDTO;
+import com.example.dto.mappers.UserMapper;
+import com.example.models.Person;
+import com.example.models.User;
+import com.example.repositories.PersonRepository;
+import com.example.repositories.UserRepository;
 import com.example.utils.ThrowingUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,10 +15,11 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PersonRepository personRepository;
 
     public Set<Person> getFamilyTree(String userId) {
-        return userRepository.getFamilyTreById(userId);
+        return personRepository.getAllByUserId(userId);
     }
 
     public UserDTO getById(String id) {

@@ -1,9 +1,9 @@
 package com.example.auth;
 
 import com.example.config.security.JwtService;
-import com.example.user.Role;
-import com.example.user.User;
-import com.example.user.UserRepository;
+import com.example.enums.Role;
+import com.example.models.User;
+import com.example.repositories.UserRepository;
 import com.example.utils.ThrowingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

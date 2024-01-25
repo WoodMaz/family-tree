@@ -1,6 +1,6 @@
-package com.example.user;
+package com.example.models;
 
-import com.example.person.Person;
+import com.example.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

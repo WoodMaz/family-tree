@@ -1,6 +1,8 @@
-package com.example.user;
+package com.example.controllers;
 
-import com.example.person.Person;
+import com.example.models.Person;
+import com.example.dto.UserDTO;
+import com.example.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +24,12 @@ public class UserController {
         return userService.getByUsername(username);
     }
 
-    @GetMapping("/{id}/get-family-tree")
+    @GetMapping("/{userId}/get-family-tree")
     public Set<Person> getFamilyTree(@PathVariable String userId) {
         return userService.getFamilyTree(userId);
     }
 
-    @PatchMapping("/{id}/add-person")
+    @PatchMapping("/{userId}/add-person")
     public void addPerson(@PathVariable String userId, @RequestBody Person person) {
         userService.addPerson(userId, person);
     }
