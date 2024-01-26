@@ -15,7 +15,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/id/{id}")
-    public UserDTO getUserDetails(@PathVariable String id) {
+    public UserDTO getUserById(@PathVariable String id) {
         return userService.getById(id);
     }
 
@@ -27,10 +27,5 @@ public class UserController {
     @GetMapping("/{userId}/get-family-tree")
     public Set<Person> getFamilyTree(@PathVariable String userId) {
         return userService.getFamilyTree(userId);
-    }
-
-    @PatchMapping("/{userId}/add-person")
-    public void addPerson(@PathVariable String userId, @RequestBody Person person) {
-        userService.addPerson(userId, person);
     }
 }

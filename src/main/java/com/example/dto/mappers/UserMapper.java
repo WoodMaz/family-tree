@@ -8,7 +8,6 @@ public class UserMapper {
         return new UserDTO(
                 user.getId(),
                 user.getUsername(),
-                user.getRole(),
-                user.getFamilyTree());
+                user.getRole());
     }
 }
