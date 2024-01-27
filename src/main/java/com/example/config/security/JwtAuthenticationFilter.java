@@ -20,7 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String AUTH_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
+    public static final String BEARER_PREFIX = "Bearer ";
 
 
     private final JwtService jwtService;

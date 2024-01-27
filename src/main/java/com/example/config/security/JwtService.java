@@ -16,15 +16,13 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    public static final String AUTH_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
 
     private static final String SECRET_KEY = "9MQEgQbkkrB9rfMgBSrb92aITytLIOde7r00w0MD2pBQ4tCFi4gLiUKcROBMggtq";
-    private static final int JWT_TTL = 1000 * 60 * 60; //1 hour
+    private static final int JWT_TTL = 1000 * 60 * 60 * 24; //24 hours
 
     public String cutPrefixFromToken(String bearerToken) {
-        if (bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(BEARER_PREFIX.length());
+        if (bearerToken.startsWith(JwtAuthenticationFilter.BEARER_PREFIX)) {
+            return bearerToken.substring(JwtAuthenticationFilter.BEARER_PREFIX.length());
         }
 
         return bearerToken;

@@ -16,13 +16,10 @@ Every member contains:
 * name
 * surname
 * dates of birth and death
-* id of mother, father and spouse
+* id of parents and spouse
 * note
 
 ### TODO list
-
-Database:
-* consider whether the database should be changed to SQL
 
 Application:
 * create methods for updating and deleting family members
@@ -33,6 +30,3 @@ Application:
 * * storing multimedia
 * * downloading a tree as e.g. PDF
 * * import/export as .ged
-
-Bugs:
-* ID is not generated for members

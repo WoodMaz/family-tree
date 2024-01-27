@@ -39,30 +39,16 @@ public class PersonAddingController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/{personId}/add-mother")
-    public ResponseEntity<Void> addMother(
+    @PostMapping("/{personId}/add-parent")
+    public ResponseEntity<Void> addParent(
             @PathVariable("userId") String userId,
             @PathVariable("personId") String personId,
-            @RequestBody Person mother) {
+            @RequestBody Person parent) {
 
         try {
-            personService.addMother(userId, personId, mother);
+            personService.addParent(userId, personId, parent);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @PostMapping("/{personId}/add-father")
-    public ResponseEntity<Void> addFather(
-            @PathVariable("userId") String userId,
-            @PathVariable("personId") String personId,
-            @RequestBody Person father) {
-
-        try {
-            personService.addFather(userId, personId, father);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

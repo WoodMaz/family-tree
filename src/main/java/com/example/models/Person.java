@@ -24,13 +24,16 @@ public class Person {
     private LocalDate birthDate;
     private LocalDate deathDate;
 
-    private String motherId;
-    private String fatherId;
+    private Set<String> parentIds = new HashSet<>();
     private Set<String> spouseIds = new HashSet<>();
 
     private String note;
 
     private String userId;
+
+    public void addParent(String parentId) {
+        this.parentIds.add(parentId);
+    }
 
     public void addSpouse(String spouseId) {
         this.spouseIds.add(spouseId);

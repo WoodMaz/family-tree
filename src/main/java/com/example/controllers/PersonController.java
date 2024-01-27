@@ -21,14 +21,25 @@ public class PersonController {
         try {
             return new ResponseEntity<>(personService.getById(personId), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PatchMapping("wife/{wifeId}/husband/{husbandId}")
-    public ResponseEntity<Void> createMarriage(
-            @PathVariable("wifeId") String wifeId,
-            @PathVariable("husbandId") String husbandId) {
-        return null;
+    @PutMapping("spouse1/{spouse1Id}/spouse2/{spouse2Id}")
+    public ResponseEntity<Void> bondSpouses(
+            @PathVariable("spouse1Id") String spouse1Id,
+            @PathVariable("spouse2Id") String spouse2Id) {
+
+        personService.bondSpouses(spouse1Id, spouse2Id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("child/{childId}/parent/{parentId}")
+    public ResponseEntity<Void> bondChildWithParent(
+            @PathVariable("childId") String childId,
+            @PathVariable("parentId") String parentId) {
+
+        personService.bondChildWithParent(childId, parentId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
