@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 //TODO: handle case when someone has more than one spouse
 
@@ -24,9 +26,13 @@ public class Person {
 
     private String motherId;
     private String fatherId;
-    private String spouseId;
+    private Set<String> spouseIds = new HashSet<>();
 
     private String note;
 
     private String userId;
+
+    public void addSpouse(String spouseId) {
+        this.spouseIds.add(spouseId);
+    }
 }

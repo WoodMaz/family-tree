@@ -32,9 +32,9 @@ public class PersonService {
     public void addSpouse(String userId, String personId, Person spouse) throws NoSuchElementException {
         Person person = getById(personId);
 
-        spouse.setSpouseId(personId);
+        spouse.addSpouse(personId);
 
-        addNewPersonWithRelation(userId, spouse, person, person::setSpouseId);
+        addNewPersonWithRelation(userId, spouse, person, person::addSpouse);
     }
 
     public void addMother(String userId, String personId, Person mother) throws NoSuchElementException {

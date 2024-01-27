@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/user")
+@RequestMapping("/user/{userId}/person")
 public class PersonAddingController {
     private final PersonService personService;
 
-    @PostMapping("/{userId}/add")
+    @PostMapping("/add")
     public ResponseEntity<Void> add(
             @PathVariable("userId") String userId,
             @RequestBody Person person) {
@@ -25,7 +25,7 @@ public class PersonAddingController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/{userId}/person/{personId}/add-spouse")
+    @PostMapping("/{personId}/add-spouse")
     public ResponseEntity<Void> addSpouse(
             @PathVariable("userId") String userId,
             @PathVariable("personId") String personId,
@@ -39,7 +39,7 @@ public class PersonAddingController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/{userId}/person/{personId}/add-mother")
+    @PostMapping("/{personId}/add-mother")
     public ResponseEntity<Void> addMother(
             @PathVariable("userId") String userId,
             @PathVariable("personId") String personId,
@@ -53,7 +53,7 @@ public class PersonAddingController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/{userId}/person/{personId}/add-father")
+    @PostMapping("/{personId}/add-father")
     public ResponseEntity<Void> addFather(
             @PathVariable("userId") String userId,
             @PathVariable("personId") String personId,
