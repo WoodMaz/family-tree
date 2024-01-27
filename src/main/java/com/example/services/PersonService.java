@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
@@ -20,6 +21,35 @@ public class PersonService {
         return personRepository.findById(personId)
                 .orElseThrow(ThrowingUtil.personNotFound(personId));
     }
+
+    public List<Person> getChildren(String personId) {
+        return personRepository.getChildren(personId);
+    }
+
+    public List<Person> getSpouses(String personId) {
+        return personRepository.getSpouses(personId);
+    }
+
+    public void updatePerson(Person person) {
+        personRepository.save(person);
+        log.info("{} {} has been updated", person.getName(), person.getSurname());
+    }
+
+    public void deleteById(String personId) {
+        Person person = getById(personId);
+
+        List<Person> children = personRepository.getChildren(personId);
+        children.forEach(child -> child.removeParent(personId));
+        personRepository.saveAll(children);
+
+        List<Person> spouses = personRepository.getSpouses(personId);
+        spouses.forEach(spouse -> spouse.removeSpouse(personId));
+        personRepository.saveAll(spouses);
+
+        personRepository.deleteById(personId);
+        log.info("{} {} has been deleted", person.getName(), person.getSurname());
+    }
+
 
     public void add(String userId, Person person) {
         person.setUserId(userId);
@@ -75,5 +105,29 @@ public class PersonService {
         personRepository.save(child);
 
         log.info("{} {} has been set as a parent of {} {}", parent.getName(), parent.getSurname(), child.getName(), child.getSurname());
+    }
+
+    public void undoBondSpouses(String spouse1Id, String spouse2Id) {
+        Person spouse1 = getById(spouse1Id);
+        Person spouse2 = getById(spouse2Id);
+
+        spouse1.removeSpouse(spouse2Id);
+        spouse2.removeSpouse(spouse1Id);
+
+        personRepository.save(spouse1);
+        personRepository.save(spouse2);
+
+        log.info("Marriage of {} {} and {} {} has been cancelled", spouse1.getName(), spouse1.getSurname(), spouse2.getName(), spouse2.getSurname());
+    }
+
+    public void undoBondChildWithParent(String childId, String parentId) {
+        Person child = getById(childId);
+        Person parent = getById(parentId);
+
+        child.removeParent(parentId);
+
+        personRepository.save(child);
+
+        log.info("{} {} is no longer a parent of {} {}", parent.getName(), parent.getSurname(), child.getName(), child.getSurname());
     }
 }

@@ -35,7 +35,15 @@ public class Person {
         this.parentIds.add(parentId);
     }
 
+    public void removeParent(String parentId) {
+        this.parentIds.remove(parentId);
+    }
+
     public void addSpouse(String spouseId) {
         this.spouseIds.add(spouseId);
+    }
+
+    public void removeSpouse(String spouseId) {
+        this.spouseIds.remove(spouseId);
     }
 }
