@@ -12,14 +12,19 @@ import java.util.Set;
 public interface PersonRepository extends MongoRepository<Person, String> {
     Set<Person> getAllByUserId(String userId);
 
-    @Query("{ "
-            + "'parentIds': { $all: [?0] } "
+    @Query(
+            "{ "
+                + "$or: ["
+                    + "{ 'fatherId': [?0] }, "
+                    + "{ 'motherId': [?0] } "
+                + "]"
             + "}"
     )
     List<Person> getChildren(String personId);
 
-    @Query("{ "
-            + "'spouseIds': { $all: [?0] } "
+    @Query(
+            "{ "
+                + "'spouseIds': { $all: [?0] } "
             + "}"
     )
     List<Person> getSpouses(String personId);

@@ -18,23 +18,23 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     
     @Override
     protected String getDatabaseName() {
-        return env.getProperty("mongo.database");
+        return env.getProperty("spring.data.mongodb.database");
     }
 
     private String getHost() {
-        return env.getProperty("mongo.host");
+        return env.getProperty("spring.data.mongodb.host");
     }
 
     private String getPort() {
-        return env.getProperty("mongo.port");
+        return env.getProperty("spring.data.mongodb.port");
     }
 
     private String getUsername() {
-        return env.getProperty("mongo.username");
+        return env.getProperty("spring.data.mongodb.username");
     }
 
     private String getPassword() {
-        return env.getProperty("mongo.password");
+        return env.getProperty("spring.data.mongodb.password");
     }
 
     @Override

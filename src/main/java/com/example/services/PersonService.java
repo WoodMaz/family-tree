@@ -37,9 +37,13 @@ public class PersonService {
 
     public void deleteById(String personId) {
         Person person = getById(personId);
-
         List<Person> children = personRepository.getChildren(personId);
-        children.forEach(child -> child.removeParent(personId));
+
+        switch (person.getSex()) {
+            case FEMALE -> children.forEach(child -> child.setMotherId(""));
+            case MALE -> children.forEach(child -> child.setFatherId(""));
+        }
+
         personRepository.saveAll(children);
 
         List<Person> spouses = personRepository.getSpouses(personId);
@@ -70,7 +74,10 @@ public class PersonService {
     public void addParent(String userId, String personId, Person parent) throws NoSuchElementException {
         Person person = getById(personId);
 
-        addNewPersonWithRelation(userId, parent, person, person::addParent);
+        switch (parent.getSex()) {
+            case FEMALE -> addNewPersonWithRelation(userId, parent, person, person::setMotherId);
+            case MALE -> addNewPersonWithRelation(userId, parent, person, person::setFatherId);
+        }
     }
 
     private void addNewPersonWithRelation(String userId, Person newPerson, Person oldPerson, Consumer<String> relationProperty) {
@@ -100,8 +107,10 @@ public class PersonService {
         Person child = getById(childId);
         Person parent = getById(parentId);
 
-        child.addParent(parentId);
-
+        switch (parent.getSex()) {
+            case FEMALE -> child.setMotherId(parentId);
+            case MALE -> child.setFatherId(parentId);
+        }
         personRepository.save(child);
 
         log.info("{} {} has been set as a parent of {} {}", parent.getName(), parent.getSurname(), child.getName(), child.getSurname());
@@ -124,7 +133,10 @@ public class PersonService {
         Person child = getById(childId);
         Person parent = getById(parentId);
 
-        child.removeParent(parentId);
+        switch (parent.getSex()) {
+            case FEMALE -> child.setMotherId("");
+            case MALE -> child.setFatherId("");
+        }
 
         personRepository.save(child);
 

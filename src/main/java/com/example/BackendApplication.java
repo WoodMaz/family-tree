@@ -9,7 +9,15 @@ public class BackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
-		System.out.println("backend: http://localhost:8080/");
-		System.out.println("mongo express: http://localhost:8081/");
+
+		System.out.println(
+			"""
+			----------------------------------------------------
+				Application started successfully! Useful URLs:
+				Local backend:  	http://localhost:8080/
+				Local database: 	http://localhost:8081/
+			----------------------------------------------------
+			
+			""");
 	}
 }

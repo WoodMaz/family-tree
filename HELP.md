@@ -7,20 +7,25 @@ As of this moment this project is a simple CRUD app. It allows to create a new m
 who can be related to other members.
 
 ### Database
-This project uses MongoDB. Currently, there is one collection called 'User' which contains:
+This project uses MongoDB. Currently, there are 2 collections:
+
+'User' which contains:
 * username
 * encrypted password
 * role (not used yet)
-* collection of family tree members (called Person in project)
 
-Every member contains:
+'Person' which contains:
 * name
 * surname
 * dates of birth and death
 * id of mother, father and spouse
 * note
+* userId
 
 ### TODO list
+
+Database:
+'User' and 'Person' can be related with 'familyTreeId' so that one user can have many trees
 
 Application:
 * test and develop security
