@@ -6,11 +6,10 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface PersonRepository extends MongoRepository<Person, String> {
-    Set<Person> getAllByUserId(String userId);
+    List<Person> getAllByUserId(String userId);
 
     @Query(
             "{ "

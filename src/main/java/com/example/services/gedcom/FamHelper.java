@@ -10,8 +10,8 @@ class FamHelper {
     private static int FAM_COUNTER = 0;
 
     private final int famNo;
-    private FamPerson mother;
-    private FamPerson father;
+    private FamPerson wife;
+    private FamPerson husband;
     private final Set<FamPerson> children = new HashSet<>();
 
     public FamHelper() {
@@ -22,33 +22,34 @@ class FamHelper {
         this.famNo = getNewFamNo();
 
         addChild(childId, childTag);
-        this.mother = new FamPerson(motherId);
-        this.father = new FamPerson(fatherId);
+        this.wife = new FamPerson(motherId);
+        this.husband = new FamPerson(fatherId);
     }
 
     public FamHelper(String motherId, int motherTag, String fatherId) {
         this.famNo = getNewFamNo();
 
-        this.mother = new FamPerson(motherId, motherTag);
-        this.father = new FamPerson(fatherId);
+        this.wife = new FamPerson(motherId, motherTag);
+        this.husband = new FamPerson(fatherId);
     }
 
     public FamHelper(String motherId, String fatherId, int fatherTag) {
         this.famNo = getNewFamNo();
 
-        this.mother = new FamPerson(motherId);
-        this.father = new FamPerson(fatherId, fatherTag);
+        this.wife = new FamPerson(motherId);
+        this.husband = new FamPerson(fatherId, fatherTag);
     }
 
+
     public void setTagIfMother(String id, int tag) {
-        if (this.mother.id.equals(id)) {
-            this.mother.tag = tag;
+        if (this.wife.id.equals(id)) {
+            this.wife.tag = tag;
         }
     }
 
     public void setTagIfFather(String id, int tag) {
-        if (this.father.id.equals(id)) {
-            this.father.tag = tag;
+        if (this.husband.id.equals(id)) {
+            this.husband.tag = tag;
         }
     }
 
@@ -56,21 +57,18 @@ class FamHelper {
         this.children.add(new FamPerson(id, tag));
     }
 
+    public boolean isParent(String id) {
+        return id.equals(husband.id) || id.equals(wife.id);
+    }
+
     public boolean areParents(String id1, String id2) {
-        return (id1.equals(father.id) && id2.equals(mother.id))
-                || (id1.equals(mother.id) && id2.equals(father.id)) ;
+        return (id1.equals(husband.id) && id2.equals(wife.id))
+                || (id1.equals(wife.id) && id2.equals(husband.id));
     }
 
-    public void createFather(String id) {
-        if (father == null) {
-            father = new FamPerson(id);
-        }
-    }
-
-    public void createMother(String id) {
-        if (mother == null) {
-            mother = new FamPerson(id);
-        }
+    public boolean isChild(String id) {
+        return children.stream()
+                .anyMatch(child -> child.getId().equals(id));
     }
 
     private int getNewFamNo() {
@@ -80,7 +78,7 @@ class FamHelper {
     @Getter
     static class FamPerson {
         private final String id;
-        private int tag;
+        private Integer tag;
 
         private FamPerson(String id) {
             this.id = id;

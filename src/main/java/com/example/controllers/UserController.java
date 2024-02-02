@@ -4,9 +4,10 @@ import com.example.models.Person;
 import com.example.dto.UserDTO;
 import com.example.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -25,7 +26,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/get-family-tree")
-    public Set<Person> getFamilyTree(@PathVariable String userId) {
+    public List<Person> getFamilyTree(@PathVariable String userId) {
         return userService.getFamilyTree(userId);
+    }
+
+    @GetMapping("{id}/export/gedcom")
+    public ResponseEntity<String> exportToGedcom(@PathVariable String id) {
+        String data = userService.exportFamilyTree(id);
+        return ResponseEntity.ok(data);
     }
 }
