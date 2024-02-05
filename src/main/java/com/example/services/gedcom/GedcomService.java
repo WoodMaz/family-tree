@@ -2,8 +2,11 @@ package com.example.services.gedcom;
 
 import com.example.enums.Sex;
 import com.example.models.Person;
+import com.example.services.gedcom.family.Family;
+import com.example.services.gedcom.family.FamilyFemaleHelper;
+import com.example.services.gedcom.family.FamilyHelper;
+import com.example.services.gedcom.family.FamilyMaleHelper;
 import com.example.utils.CommonUtils;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,10 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
-@AllArgsConstructor
 public class GedcomService {
     private static final String PERSON_TAG_PATTERN = "0 @I%d@ INDI\n";
     private static final String NAME_PATTERN = "1 NAME %s";
@@ -25,23 +26,35 @@ public class GedcomService {
     private static final String PARENT_PATTERN = "1 FAMS @F%d@\n";
     private static final String CHILD_PATTERN = "1 FAMC @F%d@\n";
 
-    private static final String FAM_TAG_PATTERN = "0 @F%d@ FAM\n";
-    private static final String FAM_HUSBAND_PATTERN = "1 HUSB @I%d@\n";
-    private static final String FAM_WIFE_PATTERN = "1 WIFE @I%d@\n";
-    private static final String FAM_CHILD_PATTERN = "1 CHIL @I%d@\n";
+    private static final String FAMILY_TAG_PATTERN = "0 @F%d@ FAM\n";
+    private static final String FAMILY_HUSBAND_PATTERN = "1 HUSB @I%d@\n";
+    private static final String FAMILY_WIFE_PATTERN = "1 WIFE @I%d@\n";
+    private static final String FAMILY_CHILD_PATTERN = "1 CHIL @I%d@\n";
 
     private static final String DATE_FORMATTER = "d MMM yyyy";
+
+
+    private final FamilyFemaleHelper familyFemaleHelper;
+    private final FamilyMaleHelper familyMaleHelper;
+
+    private GedcomCounter gedcomCounter;
+
+
+    public GedcomService(FamilyFemaleHelper familyFemaleHelper, FamilyMaleHelper familyMaleHelper) {
+        this.familyFemaleHelper = familyFemaleHelper;
+        this.familyMaleHelper = familyMaleHelper;
+    }
 
 
     public String createGedcom(List<Person> persons, String username) {
         StringBuilder output = new StringBuilder();
         writeHeaders(output);
 
-        GedcomHelper gedcomHelper = new GedcomHelper();
-        List<FamHelper> famHelpers = new ArrayList<>();
-        persons.forEach(p -> addPerson(output, p, famHelpers, gedcomHelper));
+        gedcomCounter = new GedcomCounter();
+        List<Family> families = new ArrayList<>();
+        persons.forEach(p -> addPerson(output, p, families));
 
-        writeRelations(output, famHelpers);
+        writeRelations(output, families);
         writeEnding(output, username);
 
         return output.toString();
@@ -62,71 +75,76 @@ public class GedcomService {
         output.append("0 TRLR");
     }
 
-    private void writeRelations(StringBuilder output, List<FamHelper> famHelpers) {
-        for(FamHelper fam : famHelpers) {
-            output.append(String.format(FAM_TAG_PATTERN, fam.getFamNo()));
+    private void writeRelations(StringBuilder output, List<Family> families) {
+        for(Family family : families) {
+            output.append(String.format(FAMILY_TAG_PATTERN, family.getFamilyTag()));
 
-            FamHelper.FamPerson wife = fam.getWife();
-            FamHelper.FamPerson husband = fam.getHusband();
-            Set<FamHelper.FamPerson> children = fam.getChildren();
+            Family.Member wife = family.getWife();
+            Family.Member husband = family.getHusband();
 
             if (wife != null)
-                output.append(String.format(FAM_WIFE_PATTERN, wife.getTag()));
+                output.append(String.format(FAMILY_WIFE_PATTERN, wife.getTag()));
 
             if (husband != null)
-                output.append(String.format(FAM_HUSBAND_PATTERN, husband.getTag()));
+                output.append(String.format(FAMILY_HUSBAND_PATTERN, husband.getTag()));
 
-            children.forEach(child -> output.append(String.format(FAM_CHILD_PATTERN, child.getTag())));
+            family.getChildren().forEach(child -> output.append(String.format(FAMILY_CHILD_PATTERN, child.getTag())));
         }
     }
 
-    private void addPerson(StringBuilder output, Person person, List<FamHelper> famHelpers, GedcomHelper gedcomHelper) {
-        int personTag = gedcomHelper.getNewPersonTag();
+    private void addPerson(StringBuilder output, Person person, List<Family> families) {
+        FamilyHelper familyHelper;
+        switch (person.getSex()) {
+            case FEMALE -> familyHelper = this.familyFemaleHelper;
+            case MALE -> familyHelper = this.familyMaleHelper;
+            default -> throw new IllegalStateException(String.format("Gender %s is not supported", person.getSex()));
+        }
 
-        if (famHelpers.isEmpty()) {
-            famHelpers.addAll(createFamsIfNecessary(person, personTag));
-            writePersonData(person, personTag, output, famHelpers);
+        int personTag = gedcomCounter.getNewPersonTag();
+
+        if (families.isEmpty()) {
+            families.addAll(createAllFamiliesForPerson(person, personTag, familyHelper));
+            writePersonData(person, personTag, output, families);
             return;
         }
 
-        //osoba jako dziecko
-        for (FamHelper fam : famHelpers) {
-            if (areParentsCheck(fam, person)) {
-                fam.addChild(person.getId(), personTag);
+        boolean childNotAdded = true;
+        for (Family family : families) {
+            if (family.areSpouses(person.getMotherId(), person.getFatherId())) {
+                familyHelper.addChild(family, person.getId(), personTag);
+                childNotAdded = false;
                 break;
             }
-
-            //jeżeli nie ma fama, w którym person jest dzieckiem, tworzymy nowego
-            createFamWithChild(person, personTag)
-                    .ifPresent(famHelpers::add);
         }
 
-        //dodawanie małżeństw
+        if (childNotAdded) {
+            createFamilyForChild(person, personTag, familyHelper)
+                    .ifPresent(families::add);
+        }
+
+
         for (String spouseId : person.getSpouseIds()) {
             boolean marriageDontExist = true;
 
-            for (FamHelper fam : famHelpers) {
-                if (fam.areParents(person.getId(), spouseId)) {
+            for (Family family : families) {
+                if (family.areSpouses(person.getId(), spouseId)) {
                     marriageDontExist = false;
                     break;
                 }
             }
 
             if (marriageDontExist) {
-                famHelpers.add(createFamForMarriage(person, personTag, spouseId));
+                families.add(familyHelper.createFamilyForSpouse(
+                        gedcomCounter.getNewFamilyTag(), person.getId(), personTag, spouseId));
             }
         }
 
-        //TODO: może da się to jakoś połączyć z poprzednią pętlą
-        switch (person.getSex()) {
-            case FEMALE -> famHelpers.forEach(fam -> fam.setTagIfMother(person.getId(), personTag));
-            case MALE -> famHelpers.forEach(fam -> fam.setTagIfFather(person.getId(), personTag));
-        }
+        families.forEach(family -> familyHelper.setTagIfSpouse(family, person.getId(), personTag));
 
-        writePersonData(person, personTag, output, famHelpers);
+        writePersonData(person, personTag, output, families);
     }
 
-    private void writePersonData(Person person, int personTag, StringBuilder output, List<FamHelper> famHelpers) {
+    private void writePersonData(Person person, int personTag, StringBuilder output, List<Family> families) {
         output.append(String.format(PERSON_TAG_PATTERN, personTag));
 
         String name = person.getName();
@@ -150,61 +168,35 @@ public class GedcomService {
         if (deathDate != null)
             output.append(String.format(DEATH_DATE_PATTERN, deathDate.format(DateTimeFormatter.ofPattern(DATE_FORMATTER))));
 
-        for (FamHelper fam : famHelpers) {
-            if (fam.isParent(person.getId())) {
-                output.append(String.format(PARENT_PATTERN, fam.getFamNo()));
-            } else if (fam.isChild(person.getId())) {
-                output.append(String.format(CHILD_PATTERN, fam.getFamNo()));
+        for (Family family : families) {
+            if (family.isSpouse(person.getId())) {
+                output.append(String.format(PARENT_PATTERN, family.getFamilyTag()));
+            } else if (family.isChild(person.getId())) {
+                output.append(String.format(CHILD_PATTERN, family.getFamilyTag()));
             }
         }
     }
 
-    //ta metoda tylko tworzy famHelpery jeżeli person ma rodzica/ów, lub małżonka/ów.
-    // Sprawdzanie, czy w famHelpers jest już fam z tym personem nie jest tu obsługiwane
-    private List<FamHelper> createFamsIfNecessary(Person person, int personTag) {
-        List<FamHelper> fams = new ArrayList<>(createFamsForAllSpouses(person, personTag));
+    private List<Family> createAllFamiliesForPerson(Person person, int personTag, FamilyHelper familyHelper) {
+        List<Family> families = new ArrayList<>();
 
-        createFamWithChild(person, personTag)
-                .ifPresent(fams::add);
+        person.getSpouseIds()
+                .forEach(spouseId ->
+                        families.add(familyHelper.createFamilyForSpouse(
+                                gedcomCounter.getNewFamilyTag(), person.getId(), personTag, spouseId)));
 
-        return fams;
+        createFamilyForChild(person, personTag, familyHelper)
+                .ifPresent(families::add);
+
+        return families;
     }
 
-    private List<FamHelper> createFamsForAllSpouses(Person person, int personTag) {
-        List<FamHelper> fams = new ArrayList<>();
-
-        switch (person.getSex()) {
-            case FEMALE -> person.getSpouseIds().forEach(spouseId -> fams.add(new FamHelper(person.getId(), personTag, spouseId)));
-            case MALE -> person.getSpouseIds().forEach(spouseId -> fams.add(new FamHelper(spouseId, person.getId(), personTag)));
-        }
-
-        return fams;
-    }
-
-    private FamHelper createFamForMarriage(Person person, int personTag, String spouseId) {
-        switch (person.getSex()) {
-            case FEMALE -> {
-                return new FamHelper(person.getId(), personTag, spouseId);
-            }
-            case MALE -> {
-                return new FamHelper(spouseId, person.getId(), personTag);
-            }
-            default -> throw new RuntimeException();
-        }
-    }
-
-    private Optional<FamHelper> createFamWithChild(Person child, int childTag) {
+    private Optional<Family> createFamilyForChild(Person child, int childTag, FamilyHelper familyHelper) {
         if (child.getMotherId() != null || child.getFatherId() != null) {
-            return Optional.of(new FamHelper(child.getId(), childTag, child.getMotherId(), child.getFatherId()));
+            return Optional.of(familyHelper.createFamilyForChild(
+                    gedcomCounter.getNewFamilyTag(), child.getId(), childTag, child.getMotherId(), child.getFatherId()));
         }
 
         return Optional.empty();
     }
-
-    private boolean areParentsCheck(FamHelper fam, Person person) {
-        return (fam.getWife().getId().equals(person.getMotherId()))
-                && (fam.getHusband().getId().equals(person.getFatherId()));
-    }
 }
-
-

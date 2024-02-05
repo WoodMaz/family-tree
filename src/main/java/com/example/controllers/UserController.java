@@ -25,7 +25,7 @@ public class UserController {
         return userService.getByUsername(username);
     }
 
-    @GetMapping("/{userId}/get-family-tree")
+    @GetMapping("/{userId}/family-tree")
     public List<Person> getFamilyTree(@PathVariable String userId) {
         return userService.getFamilyTree(userId);
     }

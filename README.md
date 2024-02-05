@@ -1,8 +1,7 @@
 # Documentation
 
 ### Features
-As of this moment this project is a simple CRUD app. It allows to create a new member,
-who can be related to other members. 
+This project is a family-tree app. It allows to create a complex tree and export it in a GEDCOM format
 
 
 ### Database
@@ -21,12 +20,19 @@ Every member contains:
 
 ### TODO list
 
+Database:
+* create collection 'FamilyTree' which contains:
+* -id
+* -name
+* -description
+
+- Users should have a list of familyTreeId
+- Members should have a familyTreeId
+
+
 Application:
-* create methods for updating and deleting family members
 * test and develop security
 * consider advanced features:
-* * sharing data between users
+* * sharing data between users (e.g. by familyTreeId)
 * * joining individual trees
 * * storing multimedia
-* * downloading a tree as e.g. PDF
-* * import/export as .ged
