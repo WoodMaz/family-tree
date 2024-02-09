@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface PersonRepository extends MongoRepository<Person, String> {
-    List<Person> getAllByUserId(String userId);
+    List<Person> getAllByFamilyTreeId(String familyTreeId);
 
     @Query(
             "{ "

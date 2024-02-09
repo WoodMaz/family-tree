@@ -55,33 +55,32 @@ public class PersonService {
     }
 
 
-    public void add(String userId, Person person) {
-        person.setUserId(userId);
-
+    public void add(String familyTreeId, Person person) {
+        person.setFamilyTreeId(familyTreeId);
         personRepository.save(person);
 
         log.info("{} {} has been added", person.getName(), person.getSurname());
     }
 
-    public void addSpouse(String userId, String personId, Person spouse) throws NoSuchElementException {
+    public void addSpouse(String familyTreeId, String personId, Person spouse) throws NoSuchElementException {
         Person person = getById(personId);
 
         spouse.addSpouse(personId);
 
-        addNewPersonWithRelation(userId, spouse, person, person::addSpouse);
+        addNewPersonWithRelation(familyTreeId, spouse, person, person::addSpouse);
     }
 
-    public void addParent(String userId, String personId, Person parent) throws NoSuchElementException {
+    public void addParent(String familyTreeId, String personId, Person parent) throws NoSuchElementException {
         Person person = getById(personId);
 
         switch (parent.getSex()) {
-            case FEMALE -> addNewPersonWithRelation(userId, parent, person, person::setMotherId);
-            case MALE -> addNewPersonWithRelation(userId, parent, person, person::setFatherId);
+            case FEMALE -> addNewPersonWithRelation(familyTreeId, parent, person, person::setMotherId);
+            case MALE -> addNewPersonWithRelation(familyTreeId, parent, person, person::setFatherId);
         }
     }
 
-    private void addNewPersonWithRelation(String userId, Person newPerson, Person oldPerson, Consumer<String> relationProperty) {
-        newPerson.setUserId(userId);
+    private void addNewPersonWithRelation(String familyTreeId, Person newPerson, Person oldPerson, Consumer<String> relationProperty) {
+        newPerson.setFamilyTreeId(familyTreeId);
         personRepository.save(newPerson);
 
         relationProperty.accept(newPerson.getId());

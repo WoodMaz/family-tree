@@ -2,7 +2,10 @@ package com.example.services;
 
 import com.example.dto.UserDTO;
 import com.example.dto.mappers.UserMapper;
+import com.example.models.FamilyTree;
 import com.example.models.Person;
+import com.example.models.User;
+import com.example.repositories.FamilyTreeRepository;
 import com.example.repositories.PersonRepository;
 import com.example.repositories.UserRepository;
 import com.example.services.gedcom.GedcomService;
@@ -17,10 +20,11 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PersonRepository personRepository;
+    private final FamilyTreeRepository familyTreeRepository;
     private final GedcomService gedcomService;
 
-    public List<Person> getFamilyTree(String userId) {
-        return personRepository.getAllByUserId(userId);
+    public List<Person> getAllByFamilyTreeId(String familyTreeId) {
+        return personRepository.getAllByFamilyTreeId(familyTreeId);
     }
 
     public UserDTO getById(String id) {
@@ -35,11 +39,19 @@ public class UserService {
         );
     }
 
+    public String exportFamilyTree(String username, String familyTreeId) {
+        List<Person> familyTree = getAllByFamilyTreeId(familyTreeId);
 
-    public String exportFamilyTree(String id) {
-        List<Person> familyTree = getFamilyTree(id);
-        String username = getById(id).getUsername();
+        return gedcomService.createGedcom(username, familyTree);
+    }
 
-        return gedcomService.createGedcom(familyTree, username);
+    public FamilyTree createFamilyTree(String userId, FamilyTree familyTree) {
+        User user = userRepository.getById(userId);
+        familyTreeRepository.save(familyTree);
+
+        user.addFamilyTree(familyTree.getId());
+        userRepository.save(user);
+
+        return familyTree;
     }
 }

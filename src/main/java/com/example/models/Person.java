@@ -13,7 +13,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Person {
     @Id
     private String id;
@@ -30,7 +29,7 @@ public class Person {
 
     private String note;
 
-    private String userId;
+    private String familyTreeId;
 
 
     public void addSpouse(String spouseId) {

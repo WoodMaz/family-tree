@@ -46,7 +46,7 @@ public class GedcomService {
     }
 
 
-    public String createGedcom(List<Person> persons, String username) {
+    public String createGedcom(String username, List<Person> persons) {
         StringBuilder output = new StringBuilder();
         writeHeaders(output);
 
