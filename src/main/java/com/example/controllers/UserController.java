@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import com.example.config.security.JwtAuthenticationFilter;
 import com.example.models.FamilyTree;
 import com.example.dto.UserDTO;
 import com.example.services.UserService;
@@ -15,16 +16,16 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/{username}")
-    public UserDTO getUserByName(@PathVariable String username) {
-        return userService.getByUsername(username);
+    @GetMapping
+    public UserDTO getDetails(@RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+        return userService.getDetails(token);
     }
 
-    @PostMapping("{userId}/family-tree")
+    @PostMapping("family-tree/add")
     public ResponseEntity<FamilyTree> createFamilyTree(
-            @PathVariable String userId,
-            @RequestBody FamilyTree familyTree) {
+            @RequestBody FamilyTree familyTree,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
 
-        return new ResponseEntity<>(userService.createFamilyTree(userId, familyTree), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.createFamilyTree(familyTree, token), HttpStatus.CREATED);
     }
 }

@@ -45,50 +45,47 @@ public class FamilyTreeController {
 
 
     @PostMapping("/person/add")
-    public ResponseEntity<Void> add(
+    public ResponseEntity<Person> add(
             @PathVariable("familyTreeId") String familyTreeId,
             @RequestBody Person person,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
 
         try {
-            personService.add(familyTreeId, person, token);
+            return new ResponseEntity<>(personService.add(familyTreeId, person, token), HttpStatus.CREATED);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/person/{personId}/add-spouse")
-    public ResponseEntity<Void> addSpouse(
+    public ResponseEntity<Person> addSpouse(
             @PathVariable("familyTreeId") String familyTreeId,
             @PathVariable("personId") String personId,
             @RequestBody Person spouse,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
 
         try {
-            personService.addSpouse(familyTreeId, personId, spouse, token);
+            return new ResponseEntity<>(personService.addSpouse(familyTreeId, personId, spouse, token), HttpStatus.CREATED);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/person/{personId}/add-parent")
-    public ResponseEntity<Void> addParent(
+    public ResponseEntity<Person> addParent(
             @PathVariable("familyTreeId") String familyTreeId,
             @PathVariable("personId") String personId,
             @RequestBody Person parent,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
 
         try {
-            personService.addParent(familyTreeId, personId, parent, token);
+            return new ResponseEntity<>(personService.addParent(familyTreeId, personId, parent, token), HttpStatus.CREATED);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

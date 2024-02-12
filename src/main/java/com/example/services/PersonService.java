@@ -74,30 +74,36 @@ public class PersonService {
     }
 
 
-    public void add(String familyTreeId, Person person, String token) throws AuthenticationException {
+    public Person add(String familyTreeId, Person person, String token) throws AuthenticationException {
         accessService.checkAccessToFamilyTree(familyTreeId, token);
 
         person.setFamilyTreeId(familyTreeId);
         personRepository.save(person);
 
         log.info("{} {} has been added", person.getName(), person.getSurname());
+
+        return person;
     }
 
-    public void addSpouse(String familyTreeId, String personId, Person spouse, String token) throws AuthenticationException {
+    public Person addSpouse(String familyTreeId, String personId, Person spouse, String token) throws AuthenticationException {
         Person person = accessService.getPersonIfHasAccess(personId, token);
 
         spouse.addSpouse(personId);
 
         addNewPersonWithRelation(familyTreeId, spouse, person, person::addSpouse);
+
+        return spouse;
     }
 
-    public void addParent(String familyTreeId, String personId, Person parent, String token) throws AuthenticationException {
+    public Person addParent(String familyTreeId, String personId, Person parent, String token) throws AuthenticationException {
         Person person = accessService.getPersonIfHasAccess(personId, token);
 
         switch (parent.getSex()) {
             case FEMALE -> addNewPersonWithRelation(familyTreeId, parent, person, person::setMotherId);
             case MALE -> addNewPersonWithRelation(familyTreeId, parent, person, person::setFatherId);
         }
+
+        return parent;
     }
 
     private void addNewPersonWithRelation(String familyTreeId, Person newPerson, Person oldPerson, Consumer<String> relationProperty) {

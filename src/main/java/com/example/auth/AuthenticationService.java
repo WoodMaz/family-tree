@@ -26,9 +26,8 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        repository.save(user);
 
-        String jwtToken = jwtService.generateToken(user);
+        repository.save(user);
 
         return buildAuthenticationResponse(user);
     }
@@ -50,6 +49,7 @@ public class AuthenticationService {
     private AuthenticationResponse buildAuthenticationResponse(User user) {
         String jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
+                .userId(user.getId())
                 .token(jwtToken)
                 .build();
     }

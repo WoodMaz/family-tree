@@ -1,5 +1,6 @@
 package com.example.services;
 
+import com.example.config.security.JwtService;
 import com.example.dto.UserDTO;
 import com.example.dto.mappers.UserMapper;
 import com.example.models.FamilyTree;
@@ -13,10 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class UserService {
+    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final FamilyTreeRepository familyTreeRepository;
 
-    public UserDTO getByUsername(String username) {
+    public UserDTO getDetails(String token) {
+        String username = jwtService.extractUsername(token);
+
         return UserMapper.asDTO(
                 userRepository
                         .getByUsername(username)
@@ -24,8 +28,11 @@ public class UserService {
         );
     }
 
-    public FamilyTree createFamilyTree(String userId, FamilyTree familyTree) {
-        User user = userRepository.getById(userId);
+    public FamilyTree createFamilyTree(FamilyTree familyTree, String token) {
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.getByUsername(username)
+                .orElseThrow(ThrowingUtil.userNotFound(username));
+
         familyTreeRepository.save(familyTree);
 
         user.addFamilyTree(familyTree.getId());
