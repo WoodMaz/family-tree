@@ -20,12 +20,9 @@ Every member contains:
 
 ### TODO list
 
-
-
-
 Application:
+* more logs
 * test and develop security
-* * at the moment each user can see each tree if only they know ID. There is need to secure trees. 
 * consider advanced features:
 * * sharing data between users (e.g. by familyTreeId)
 * * joining individual trees

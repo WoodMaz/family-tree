@@ -1,0 +1,94 @@
+package com.example.controllers;
+
+import com.example.config.security.JwtAuthenticationFilter;
+import com.example.models.Person;
+import com.example.services.PersonService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.naming.AuthenticationException;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+@RequestMapping("/family-tree/{familyTreeId}")
+public class FamilyTreeController {
+    private final PersonService personService;
+
+    @GetMapping
+    public ResponseEntity<List<Person>> getFamilyTree(
+            @PathVariable String familyTreeId,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            return ResponseEntity.ok(personService.getAllByFamilyTreeId(familyTreeId, token));
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @GetMapping("/export/gedcom")
+    public ResponseEntity<String> exportToGedcom(
+            @PathVariable String familyTreeId,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            return ResponseEntity.ok(personService.exportFamilyTree(familyTreeId, token));
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+
+    @PostMapping("/person/add")
+    public ResponseEntity<Void> add(
+            @PathVariable("familyTreeId") String familyTreeId,
+            @RequestBody Person person,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            personService.add(familyTreeId, person, token);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/person/{personId}/add-spouse")
+    public ResponseEntity<Void> addSpouse(
+            @PathVariable("familyTreeId") String familyTreeId,
+            @PathVariable("personId") String personId,
+            @RequestBody Person spouse,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            personService.addSpouse(familyTreeId, personId, spouse, token);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/person/{personId}/add-parent")
+    public ResponseEntity<Void> addParent(
+            @PathVariable("familyTreeId") String familyTreeId,
+            @PathVariable("personId") String personId,
+            @RequestBody Person parent,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            personService.addParent(familyTreeId, personId, parent, token);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+}
