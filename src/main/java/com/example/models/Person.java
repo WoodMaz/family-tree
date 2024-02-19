@@ -31,6 +31,18 @@ public class Person {
 
     private String familyTreeId;
 
+    public Person(Person src, String familyTreeId) {
+        this.name = src.name;
+        this.surname = src.surname;
+        this.sex = src.sex;
+        this.birthDate = src.birthDate;
+        this.deathDate = src.deathDate;
+        this.motherId = src.motherId;
+        this.fatherId = src.fatherId;
+        this.spouseIds.addAll(src.spouseIds);
+        this.note = src.note;
+        this.familyTreeId = familyTreeId;
+    }
 
     public void addSpouse(String spouseId) {
         this.spouseIds.add(spouseId);

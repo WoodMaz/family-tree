@@ -19,19 +19,17 @@ public class UserService {
     private final FamilyTreeRepository familyTreeRepository;
 
     public UserDTO getDetails(String token) {
-        String username = jwtService.extractUsername(token);
+        return UserMapper.asDTO(getByToken(token));
+    }
 
-        return UserMapper.asDTO(
-                userRepository
-                        .getByUsername(username)
-                        .orElseThrow(ThrowingUtil.userNotFound(username))
-        );
+    public User getByToken(String token) {
+        String username = jwtService.extractUsername(token);
+        return userRepository.getByUsername(username)
+                .orElseThrow(ThrowingUtil.userNotFound(username));
     }
 
     public FamilyTree createFamilyTree(FamilyTree familyTree, String token) {
-        String username = jwtService.extractUsername(token);
-        User user = userRepository.getByUsername(username)
-                .orElseThrow(ThrowingUtil.userNotFound(username));
+        User user = getByToken(token);
 
         familyTreeRepository.save(familyTree);
 
@@ -39,5 +37,11 @@ public class UserService {
         userRepository.save(user);
 
         return familyTree;
+    }
+
+    public void addFamilyTree(String familyTreeId, String token) {
+        User user = getByToken(token);
+        user.getFamilyTreeIds().add(familyTreeId);
+        userRepository.save(user);
     }
 }

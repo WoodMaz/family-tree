@@ -1,7 +1,11 @@
 # Documentation
 
 ### Features
-This project is a family-tree app. It allows to create a complex tree and export it in a GEDCOM format
+This project is a family-tree app. It allows to:
+* create and manage complex family trees;
+* export them in a GEDCOM format;
+* merge trees
+
 
 
 ### Database
@@ -21,9 +25,9 @@ Every member contains:
 ### TODO list
 
 Application:
+* consider if FamilyTree class should store personId, and Person class shouldn't know about FamilyTree
 * more logs
 * test and develop security
 * consider advanced features:
 * * sharing data between users (e.g. by familyTreeId)
-* * joining individual trees
 * * storing multimedia
