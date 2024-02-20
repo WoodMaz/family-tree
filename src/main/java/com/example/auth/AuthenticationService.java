@@ -4,7 +4,7 @@ import com.example.config.security.JwtService;
 import com.example.enums.Role;
 import com.example.models.User;
 import com.example.repositories.UserRepository;
-import com.example.utils.ThrowingUtil;
+import com.example.utils.ThrowingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +41,7 @@ public class AuthenticationService {
         );
 
         User user = repository.getByUsername(request.getUsername())
-                .orElseThrow(ThrowingUtil.userNotFound(request.getUsername()));
+                .orElseThrow(ThrowingUtils.userNotFound(request.getUsername()));
 
         return buildAuthenticationResponse(user);
     }

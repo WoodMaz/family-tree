@@ -26,6 +26,17 @@ public class FamilyTreeService {
     private final PersonRepository personRepository;
     private final FamilyTreeRepository familyTreeRepository;
 
+    public FamilyTree createFamilyTree(FamilyTree familyTree, String token) {
+        User user = userService.getByToken(token);
+
+        familyTreeRepository.save(familyTree);
+
+        user.addFamilyTree(familyTree.getId());
+        userRepository.save(user);
+
+        return familyTree;
+    }
+
     public void delete(String id, String token) throws AuthenticationException {
         accessService.checkAccessToFamilyTree(id, token);
 

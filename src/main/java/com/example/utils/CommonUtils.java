@@ -42,6 +42,8 @@ public class CommonUtils {
         if (o1 == null || o2 == null)
             return false;
 
+
+
         for (Function<T, ?> getter : propertyGetters) {
             Object itemField = getter.apply(o1);
             Object valueField = getter.apply(o2);

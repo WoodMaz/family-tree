@@ -3,7 +3,7 @@ package com.example.services;
 import com.example.models.Person;
 import com.example.models.User;
 import com.example.repositories.PersonRepository;
-import com.example.utils.ThrowingUtil;
+import com.example.utils.ThrowingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class AccessService {
         User user = userService.getByToken(token);
 
         Person person = personRepository.findById(personId)
-                .orElseThrow(ThrowingUtil.personNotFound(personId));
+                .orElseThrow(ThrowingUtils.personNotFound(personId));
 
         if (!user.getFamilyTreeIds().contains(person.getFamilyTreeId())) {
             throw new AuthenticationException("User have no access to this family tree");

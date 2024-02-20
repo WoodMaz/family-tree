@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class ThrowingUtil {
+public class ThrowingUtils {
     public static Supplier<UsernameNotFoundException> userNotFound(String username) {
         return () -> new UsernameNotFoundException(String.format("User: %s not found", username));
     }

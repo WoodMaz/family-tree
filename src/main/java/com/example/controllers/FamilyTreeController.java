@@ -35,6 +35,14 @@ public class FamilyTreeController {
         }
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<FamilyTree> createFamilyTree(
+            @RequestBody FamilyTree familyTree,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        return new ResponseEntity<>(familyTreeService.createFamilyTree(familyTree, token), HttpStatus.CREATED);
+    }
+
     @GetMapping("/{familyTreeId}/export/gedcom")
     public ResponseEntity<String> exportToGedcom(
             @PathVariable String familyTreeId,
