@@ -9,6 +9,8 @@ import com.example.utils.ThrowingUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -25,9 +27,17 @@ public class UserService {
                 .orElseThrow(ThrowingUtils.userNotFound(username));
     }
 
-    public void addFamilyTree(String familyTreeId, String token) {
+    public void addFamilyTreeId(String familyTreeId, String token) {
         User user = getByToken(token);
         user.getFamilyTreeIds().add(familyTreeId);
         userRepository.save(user);
+    }
+
+    void update(User user) {
+        userRepository.save(user);
+    }
+
+    List<User> findAllByFamilyTree(String id) {
+        return userRepository.findAllByFamilyTree(id);
     }
 }

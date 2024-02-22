@@ -33,7 +33,7 @@ public class PersonController {
         }
     }
 
-    @GetMapping("/{personId}/get-children")
+    @GetMapping("/{personId}/children")
     public ResponseEntity<List<Person>> getChildren(
             @PathVariable String personId,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
@@ -42,7 +42,7 @@ public class PersonController {
         return ResponseEntity.ok(personService.getChildren(personId, token));
     }
 
-    @GetMapping("/{personId}/get-spouses")
+    @GetMapping("/{personId}/spouses")
     public ResponseEntity<List<Person>> getSpouses(
             @PathVariable String personId,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
@@ -56,11 +56,11 @@ public class PersonController {
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
             throws AuthenticationException {
 
-        personService.updatePerson(person, token);
+        personService.update(person, token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{personId}/delete")
+    @DeleteMapping("/{personId}")
     public ResponseEntity<Void> deletePerson(
             @PathVariable String personId,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
@@ -70,7 +70,7 @@ public class PersonController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/spouse1/{spouse1Id}/spouse2/{spouse2Id}")
+    @PutMapping("/marriage/{spouse1Id}/{spouse2Id}")
     public ResponseEntity<Void> bondSpouses(
             @PathVariable("spouse1Id") String spouse1Id,
             @PathVariable("spouse2Id") String spouse2Id,
@@ -92,25 +92,70 @@ public class PersonController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/undo/spouse1/{spouse1Id}/spouse2/{spouse2Id}")
-    public ResponseEntity<Void> undoBondSpouses(
+    @DeleteMapping("/marriage/{spouse1Id}/{spouse2Id}")
+    public ResponseEntity<Void> debondSpouses(
             @PathVariable("spouse1Id") String spouse1Id,
             @PathVariable("spouse2Id") String spouse2Id,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
             throws AuthenticationException {
 
-        personService.undoBondSpouses(spouse1Id, spouse2Id, token);
+        personService.debondSpouses(spouse1Id, spouse2Id, token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/undo/child/{childId}/parent/{parentId}")
-    public ResponseEntity<Void> undoBondChildWithParent(
+    @DeleteMapping("/child/{childId}/parent/{parentId}")
+    public ResponseEntity<Void> debondChildFromParent(
             @PathVariable("childId") String childId,
             @PathVariable("parentId") String parentId,
             @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token)
             throws AuthenticationException {
 
-        personService.undoBondChildWithParent(childId, parentId, token);
+        personService.debondChildFromParent(childId, parentId, token);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<Person> add(
+            @RequestParam("familyTreeId") String familyTreeId,
+            @RequestBody Person person,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            return new ResponseEntity<>(personService.add(familyTreeId, person, token), HttpStatus.CREATED);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping("{personId}/spouse")
+    public ResponseEntity<Person> addSpouse(
+            @RequestParam("familyTreeId") String familyTreeId,
+            @PathVariable("personId") String personId,
+            @RequestBody Person spouse,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            return new ResponseEntity<>(personService.addSpouse(familyTreeId, personId, spouse, token), HttpStatus.CREATED);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("{personId}/parent")
+    public ResponseEntity<Person> addParent(
+            @RequestParam("familyTreeId") String familyTreeId,
+            @PathVariable("personId") String personId,
+            @RequestBody Person parent,
+            @RequestHeader(JwtAuthenticationFilter.AUTH_HEADER) String token) {
+
+        try {
+            return new ResponseEntity<>(personService.addParent(familyTreeId, personId, parent, token), HttpStatus.CREATED);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
