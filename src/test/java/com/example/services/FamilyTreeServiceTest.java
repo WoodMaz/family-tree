@@ -19,13 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class FamilyTreeServiceTest {
-    @Mock
-    private JwtService jwtService;
+    @Mock private JwtService jwtService;
     @Mock private UserService userService;
     @Mock private PersonService personService;
     @Mock private GedcomService gedcomService;
@@ -88,7 +86,7 @@ public class FamilyTreeServiceTest {
                 Sex.FEMALE, LocalDate.of(1947, 4, 28), null,
                 null, null, new HashSet<>(List.of("fatherId2")), null, "2");
         
-        Person father2 = new Person("fatherId2", "father", "B",
+        Person father2 = new Person("fatherId2", "father", "A",
                 Sex.MALE, LocalDate.of(1946, 4, 15), null,
                 null, null, new HashSet<>(List.of("motherId2")), null, "2");
 
@@ -107,21 +105,16 @@ public class FamilyTreeServiceTest {
         people2.add(motherInLaw2);
         people2.add(fatherInLawId2);
 
-        personService = mock(PersonService.class);
-        when(personService.getAllByFamilyTreeId("1")).thenReturn(people1);
-        when(personService.getAllByFamilyTreeId("2")).thenReturn(people2);
+        doReturn(people1).when(personService).getAllByFamilyTreeId("1");
+        doReturn(people2).when(personService).getAllByFamilyTreeId("2");
 
-        when(personService.copyToOtherFamilyTree(person1, mergedTree.getId())).thenReturn(copyToOtherTree(person1, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(wife1, mergedTree.getId())).thenReturn(copyToOtherTree(wife1, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(mother1, mergedTree.getId())).thenReturn(copyToOtherTree(mother1, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(father1, mergedTree.getId())).thenReturn(copyToOtherTree(father1, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(grandma1, mergedTree.getId())).thenReturn(copyToOtherTree(grandma1, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(person2, mergedTree.getId())).thenReturn(copyToOtherTree(person2, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(wife2, mergedTree.getId())).thenReturn(copyToOtherTree(wife2, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(mother2, mergedTree.getId())).thenReturn(copyToOtherTree(mother2, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(father2, mergedTree.getId())).thenReturn(copyToOtherTree(father2, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(motherInLaw2, mergedTree.getId())).thenReturn(copyToOtherTree(motherInLaw2, mergedTree.getId()));
-        when(personService.copyToOtherFamilyTree(fatherInLawId2, mergedTree.getId())).thenReturn(copyToOtherTree(fatherInLawId2, mergedTree.getId()));
+        doReturn(copyToOtherTree(person1, mergedTree.getId())).when(personService).copyToOtherFamilyTree(person1, mergedTree.getId());
+        doReturn(copyToOtherTree(wife1, mergedTree.getId())).when(personService).copyToOtherFamilyTree(wife1, mergedTree.getId());
+        doReturn(copyToOtherTree(mother1, mergedTree.getId())).when(personService).copyToOtherFamilyTree(mother1, mergedTree.getId());
+        doReturn(copyToOtherTree(father1, mergedTree.getId())).when(personService).copyToOtherFamilyTree(father1, mergedTree.getId());
+        doReturn(copyToOtherTree(grandma1, mergedTree.getId())).when(personService).copyToOtherFamilyTree(grandma1, mergedTree.getId());
+        doReturn(copyToOtherTree(motherInLaw2, mergedTree.getId())).when(personService).copyToOtherFamilyTree(motherInLaw2, mergedTree.getId());
+        doReturn(copyToOtherTree(fatherInLawId2, mergedTree.getId())).when(personService).copyToOtherFamilyTree(fatherInLawId2, mergedTree.getId());
 
         List<Person> mergedPeople = familyTreeService.mergeFamilyTreesForTest(familyTreeIds, mergedTree, token);
 

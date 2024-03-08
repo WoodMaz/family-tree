@@ -164,7 +164,7 @@ public class FamilyTreeService {
 
 
     @Deprecated
-    //TODO: for test only, delete
+    //TODO: needed for test only to see finalList, delete
     public List<Person> mergeFamilyTreesForTest(List<String> familyTreeIds, FamilyTree mergedTree, String token) throws AuthenticationException {
         List<Person> allPeople = new ArrayList<>();
 
